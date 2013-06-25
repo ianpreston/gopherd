@@ -21,7 +21,7 @@ func (req *Request) Handle(selector string) {
 	selector = path.Clean(selector)
 	physPath := path.Join(req.gopherRoot, selector)
 
-	if strings.Index(physPath, req.gopherRoot) == -1 {
+	if strings.Index(physPath, req.gopherRoot) != 0 {
 		req.serveError("Invalid")
 		return
 	}
