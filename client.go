@@ -34,9 +34,7 @@ func (cli *Client) Handle() {
 }
 
 func (cli *Client) HandleRequest(selector string) {
-	fmt.Fprintf(cli.conn, "iSpecified Selector: '" + selector + "'\t\tlocalhost\t7070\r\n")
-	fmt.Fprintf(cli.conn, "1Not a real directory (/dev/null)\t/dev/null\tlocalhost\t7070\r\n")
-	fmt.Fprintf(cli.conn, "1Not a real directory (root)\t\tlocalhost\t7070\r\n")
-	fmt.Fprintf(cli.conn, "0Using web browsers in Gopherspace\tgopher/wbgopher\tgopher.floodgap.com\t70\r\n")
-	fmt.Fprintf(cli.conn, ".")
+	fmt.Println("Handling request for: " + selector)
+	req := NewRequest(cli, "/Users/ian/gopherroot/")
+	req.Handle(selector)
 }
