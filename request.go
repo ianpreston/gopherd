@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 	"mime"
+	"bufio"
 )
 
 type Request struct {
@@ -61,8 +62,32 @@ func (req *Request) HandleDirectory(physPath string) {
 }
 
 func (req *Request) HandleFile(physPath string) {
-	fmt.Fprintf(req.cli.conn, "This will be the content of '" + physPath + "'")
-	fmt.Fprintf(req.cli.conn, "\r\n.")
+	file, err := os.Open(physPath)
+	if (err != nil) {
+		req.serveError("Failed to open file")
+	}
+
+	buf := make([]byte, 4096)
+	reader := bufio.NewReader(file)
+	writer := bufio.NewWriter(req.cli.conn)
+
+	for {
+		_, err := reader.Read(buf)
+		if (err != nil) {
+			break
+		}
+
+		writer.Write(buf)
+	}
+
+	writer.Flush()
+	file.Close()
+
+	// If the file is text, we must send a '.' on its own line
+	fi, _ := os.Stat(physPath)
+	if (req.getPathByte(fi) == '0') {
+		fmt.Fprintf(req.cli.conn, "\r\n.")
+	}
 }
 
 func (req *Request) getPathByte(fi os.FileInfo) byte {
