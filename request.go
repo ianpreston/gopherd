@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"mime"
 )
 
 type Request struct {
@@ -53,7 +54,7 @@ func (req *Request) HandleDirectory(physPath string) {
 	}
 
 	for _, fi := range children {
-		fmt.Fprintf(req.cli.conn, "0" + fi.Name() + "\t" + fi.Name() + "\tlocalhost\t7070\r\n")
+		fmt.Fprintf(req.cli.conn, string(req.getPathByte(fi)) + fi.Name() + "\t" + fi.Name() + "\tlocalhost\t7070\r\n")
 	}
 
 	fmt.Fprintf(req.cli.conn, ".")
@@ -62,6 +63,29 @@ func (req *Request) HandleDirectory(physPath string) {
 func (req *Request) HandleFile(physPath string) {
 	fmt.Fprintf(req.cli.conn, "This will be the content of '" + physPath + "'")
 	fmt.Fprintf(req.cli.conn, "\r\n.")
+}
+
+func (req *Request) getPathByte(fi os.FileInfo) byte {
+	ext := path.Ext(fi.Name())
+	mimeType := mime.TypeByExtension(ext)
+
+	if (fi.IsDir()) {
+		return '1'
+	}
+
+	if (mimeType == "image/gif") {
+		return 'g'
+	}
+	if (strings.Index(mimeType, "image/") == 0) {
+		return 'I'
+	}
+	if (strings.Index(mimeType, "text/") == 0 ||
+		strings.Index(mimeType, "json") != -1 ||
+		strings.Index(mimeType, "xml") != -1) {
+		return '0'
+	}
+
+	return '9'
 }
 
 func (req *Request) serveError(err string) {
