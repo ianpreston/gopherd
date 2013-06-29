@@ -1,6 +1,12 @@
 package main
 
 func main() {
-	server := NewServer(":7070")
+	sc := &ServerConfig{
+		":7070",
+		"localhost",
+		7070,
+		"/Users/ian/gopherroot",
+	}
+	server := NewServer(sc)
 	server.Run()
 }

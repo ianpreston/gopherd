@@ -7,23 +7,22 @@ import (
 	"strings"
 	"mime"
 	"bufio"
+	"strconv"
 )
 
 type Request struct {
 	cli *Client
-	gopherRoot string
 }
 
-func NewRequest(cli *Client, gopherRoot string) *Request {
-	gopherRoot = path.Clean(gopherRoot)
-	return &Request{ cli, gopherRoot };
+func NewRequest(cli *Client) *Request {
+	return &Request{ cli };
 }
 
 func (req *Request) Handle(selector string) {
 	selector = path.Clean(selector)
-	physPath := path.Join(req.gopherRoot, selector)
+	physPath := path.Join(req.cli.conf.root, selector)
 
-	if strings.Index(physPath, req.gopherRoot) != 0 {
+	if strings.Index(physPath, req.cli.conf.root) != 0 {
 		req.serveError("Invalid")
 		return
 	}
@@ -55,7 +54,7 @@ func (req *Request) HandleDirectory(physPath string) {
 	}
 
 	for _, fi := range children {
-		fmt.Fprintf(req.cli.conn, string(req.getPathByte(fi)) + fi.Name() + "\t" + fi.Name() + "\tlocalhost\t7070\r\n")
+		fmt.Fprintf(req.cli.conn, string(req.getPathByte(fi)) + fi.Name() + "\t" + fi.Name() + "\t" + req.cli.conf.host + "\t" + strconv.Itoa(req.cli.conf.port) + "\r\n")
 	}
 
 	fmt.Fprintf(req.cli.conn, ".")

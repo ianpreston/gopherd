@@ -10,12 +10,13 @@ import (
 type Client struct {
 	conn net.Conn
 	reader *bufio.Reader
+	conf *ServerConfig
 }
 
-func NewClient(conn net.Conn) *Client {
+func NewClient(conn net.Conn, conf *ServerConfig) *Client {
 	reader := bufio.NewReader(conn)
 
-	return &Client { conn, reader }
+	return &Client { conn, reader, conf }
 }
 
 func (cli *Client) Handle() {
@@ -35,6 +36,6 @@ func (cli *Client) Handle() {
 
 func (cli *Client) HandleRequest(selector string) {
 	fmt.Println("Handling request for: " + selector)
-	req := NewRequest(cli, "/Users/ian/gopherroot/")
+	req := NewRequest(cli)
 	req.Handle(selector)
 }

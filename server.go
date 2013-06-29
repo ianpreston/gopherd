@@ -4,24 +4,31 @@ import (
 	"net"
 )
 
-type Server struct {
-	listener net.Listener	
+type ServerConfig struct {
+	bindTo string
+	host string
+	port int
+	root string
 }
 
-func NewServer(bindTo string) *Server {
-	l, err := net.Listen("tcp", bindTo)
+type Server struct {
+	listener net.Listener
+	conf *ServerConfig
+}
+
+func NewServer(conf *ServerConfig) *Server {
+	l, err := net.Listen("tcp", conf.bindTo)
 	if err != nil {
 		return nil
 	}
 
-	return &Server{ l }
+	return &Server{ l, conf }
 }
 
 func (srv *Server) Run() {
 	for {
 		conn, err := srv.listener.Accept()
 		if err != nil {
-			panic(err)
 			conn.Close()
 			continue
 		}
@@ -31,6 +38,6 @@ func (srv *Server) Run() {
 }
 
 func (srv *Server) Handle(conn net.Conn) {
-	cli := NewClient(conn)
+	cli := NewClient(conn, srv.conf)
 	cli.Handle()
 }
