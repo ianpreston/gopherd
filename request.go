@@ -20,9 +20,9 @@ func NewRequest(cli *Client) *Request {
 
 func (req *Request) Handle(selector string) {
 	selector = path.Clean(selector)
-	physPath := path.Join(req.cli.conf.root, selector)
+	physPath := path.Join(req.cli.conf.Root, selector)
 
-	if strings.Index(physPath, req.cli.conf.root) != 0 {
+	if strings.Index(physPath, req.cli.conf.Root) != 0 {
 		req.serveError("Invalid")
 		return
 	}
@@ -54,7 +54,7 @@ func (req *Request) HandleDirectory(physPath string) {
 	}
 
 	for _, fi := range children {
-		fmt.Fprintf(req.cli.conn, string(req.getPathByte(fi)) + fi.Name() + "\t" + fi.Name() + "\t" + req.cli.conf.host + "\t" + strconv.Itoa(req.cli.conf.port) + "\r\n")
+		fmt.Fprintf(req.cli.conn, string(req.getPathByte(fi)) + fi.Name() + "\t" + fi.Name() + "\t" + req.cli.conf.Host + "\t" + strconv.Itoa(req.cli.conf.Port) + "\r\n")
 	}
 
 	fmt.Fprintf(req.cli.conn, ".")

@@ -4,20 +4,13 @@ import (
 	"net"
 )
 
-type ServerConfig struct {
-	bindTo string
-	host string
-	port int
-	root string
-}
-
 type Server struct {
 	listener net.Listener
 	conf *ServerConfig
 }
 
 func NewServer(conf *ServerConfig) *Server {
-	l, err := net.Listen("tcp", conf.bindTo)
+	l, err := net.Listen("tcp", conf.BindTo)
 	if err != nil {
 		return nil
 	}

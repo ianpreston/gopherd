@@ -1,12 +1,17 @@
 package main
 
+import (
+	"flag"
+)
+
 func main() {
-	sc := &ServerConfig{
-		":7070",
-		"localhost",
-		7070,
-		"/Users/ian/gopherroot",
+	flag.Parse()
+	confPath := flag.Arg(0)
+	if confPath == "" {
+		confPath = "config.json"
 	}
-	server := NewServer(sc)
+	conf := LoadJsonConfig(confPath)
+
+	server := NewServer(conf)
 	server.Run()
 }
