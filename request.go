@@ -54,6 +54,9 @@ func (req *Request) HandleDirectory(physPath string) {
 	}
 
 	for _, fi := range children {
+		if strings.Index(fi.Name(), ".") == 0 {
+			continue
+		}
 		fmt.Fprintf(req.cli.conn, string(req.getPathByte(fi)) + fi.Name() + "\t" + fi.Name() + "\t" + req.cli.conf.Host + "\t" + strconv.Itoa(req.cli.conf.Port) + "\r\n")
 	}
 
@@ -61,9 +64,15 @@ func (req *Request) HandleDirectory(physPath string) {
 }
 
 func (req *Request) HandleFile(physPath string) {
+	if strings.Index(path.Base(physPath), ".") == 0 {
+		req.serveError("Failed to open file")
+		return
+	}
+
 	file, err := os.Open(physPath)
 	if (err != nil) {
 		req.serveError("Failed to open file")
+		return
 	}
 
 	buf := make([]byte, 4096)
