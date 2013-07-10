@@ -53,6 +53,20 @@ func (req *Request) HandleDirectory(physPath string) {
 		return
 	}
 
+	// If a .banner file exists in this directory, echo its contents line-by-line as info ('i' character)
+	banner_fd, err := os.Open(path.Join(physPath, ".banner"))
+	if err == nil {
+		banner_reader := bufio.NewReader(banner_fd)
+		for {
+			line, err := banner_reader.ReadString('\n')
+			line = strings.Trim(line, "\r\n\t ")
+			fmt.Fprintf(req.cli.conn, "i" + line + "\terror\terror\t0\r\n")
+			if err != nil {
+				break
+			}
+		}
+	}
+
 	for _, fi := range children {
 		if strings.Index(fi.Name(), ".") == 0 {
 			continue
